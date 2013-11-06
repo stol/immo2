@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Immo</title>
+</head>
+<body>
+    <form action="/places" method="get">
+        <p>
+            m2 min <input type="text" name="surface_min"/>
+            m2 max <input type="text" name="surface_max"/>
+        </p>
+        <p>
+            € min <input type="text" name="price_min"/>
+            € max <input type="text" name="price_max"/>
+        </p>
+        <p>
+            Code postal <input type="text" name="zip" value="75"/>
+        </p>
+        <p>
+            <input type="submit" name="submit" value="Filtrer"/>
+        </p>
+    </form>
+    <table id="liste" class="sortable" width="100%">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Intitulé</th>
+                <th>Lieu</th>
+                <th class="sorttable_numeric">Prix m2</th>
+                <th class="sorttable_numeric">Prix</th>
+                <th class="sorttable_numeric">Prix moy.</th>
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </ul>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="/js/moment.min.js"></script>
+<script src="/js/humanize.js"></script>
+<script src="/js/sorttable.js"></script>
+<script>
+Array.prototype.sum = function()
+{
+    var a = this[0];
+    for (var i = 1; i < this.length; i++) {
+        a = a + this[i];
+    }
+    return a;
+};
+
+(function($){
+    function refresh(data){
+        $("#liste tbody").empty();
+
+        $.ajax({
+            url: "/places",
+            type: "get",
+            data: data || {}
+        }).done(function (places) {
+            var metas = {};
+            $.each(places, function(i,place){
+                var key = ''+place.zip+place.surface;
+                metas[key] = metas[key] || {};
+                metas[key].prices = metas[key].prices || [];
+                metas[key].prices.push(place.price);
+                metas[key].average = Math.round(metas[key].prices.sum() / metas[key].prices.length);
+            });
+            console.log(metas);
+
+            $.each(places, function(i,place){
+                $("#liste tbody").append('<tr>'
+                    + '<td sorttable_customkey="'+place.provider_at+'">'+moment.unix(place.provider_at).format("DD/MM/YY") +'</td>'
+                    + '<td><a href="'+place.href+'" target="_blank">'+place.title+'</a></td>'
+                    + '<td>'
+                        +place.zip
+                        +(place.proximity ? ' ('+place.proximity+')' : '')
+                    +'</td>'
+                    + '<td sorttable_customkey="'+Math.round(place.price/place.surface)+'">'+humanize.numberFormat(place.price/place.surface,0, ',', ' ')+' €</td>'
+                    + '<td sorttable_customkey="'+place.price+'">'+humanize.numberFormat(place.price,0, ',', ' ')+' €</td>'
+                    + '<td sorttable_customkey="'+metas[''+place.zip+place.surface].average+'">'+humanize.numberFormat(metas[''+place.zip+place.surface].average,0,',', ' ')+' €</td>'
+                + '</tr>');
+            })
+        });        
+    }
+
+    $(document).on("submit", "form", function(e){
+        refresh($(this).serialize());
+        e.preventDefault();
+    })
+})(jQuery);
+
+</script>
+</body>
+</html>
