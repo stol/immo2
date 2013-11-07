@@ -1,3 +1,19 @@
+////////////////////// CONFIGURATION
+var surface_min = 52,
+    surface_max = 75,
+    TYPE = 2, // 2 = VENTE, 1 = LOCATION
+    ZIP = [
+          75    // Paris
+        //, 92230 // sceaux
+        //, 92340 // bourg la reine
+        //, 94300 // vincennes 
+        //, 92250 // la garenne colombe
+        //, 92700, // colombes
+        //, 92120  // montrouge
+    ];
+
+////////////////////// DO NOT CHANGE :p
+
 var _      = require('underscore'),
     mysql  = require('mysql'),
     moment = require('moment'),
@@ -13,40 +29,28 @@ var connection = mysql.createConnection({
 });
 
 connection.connect();
-//connection.query('TRUNCATE lieux');
 
 var c = new Crawler({
     maxConnections: 4,
     forceUTF8: true
 });
 
-var surface_min = 52,
-    surface_max = 54,
-    workers_nb = 2,
-    TYPE = 2, // 2 = VENTE, 1 = LOCATION
-    ZIP = [
-        75,    // Paris
-        // ,92340 // sceaux
-        // ,92340 // bourg la reine
-        // ,94300 // vincennes 
-        // ,92250 // la garenne colombe
-        // //,92700, // colombes
-        // ,92120  // montrouge
-    ];
+
+var todo = 0;
 
 function fetchPage(provider, zip, surface, page, page_max){
-    console.log('fetching surface '+surface+" page "+page+'/'+(page_max || '??'));
+    todo++;
 
-    this.busy = 1;
     var url = provider.url
         .replace(/\{\{TYPE\}\}/g, TYPE)
         .replace(/\{\{SURFACE\}\}/g, surface)
         .replace(/\{\{PAGE\}\}/g, page)
         .replace(/\{\{ZIP\}\}/g, zip)
-    console.log("fetching ", url);
+
     c.queue([{
         uri: url,
         callback: function(error,result, $){
+            console.log(zip+' ('+surface+"m2), page "+page+'/'+(page_max || '??') + " => "+url);
             if (error){
                 console.log("ERREUR sur "+url);
                 console.log(error);
@@ -78,7 +82,11 @@ function fetchPage(provider, zip, surface, page, page_max){
                 fetchPage(provider, zip, surface, page+1, page_max);
             }
 
-
+            todo--;
+            if (todo == 0){
+                console.log("FINI");
+                process.exit(code=0);
+            }
         },
     }]);
 }
