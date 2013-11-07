@@ -10,6 +10,7 @@
     "jsdom": "*",
     "underscore": "*",
     "mysql": "2.0.0-alpha3",
-    "moment": "*"
+    "moment": "*",
+    "crawler": "*"
   }
 }
