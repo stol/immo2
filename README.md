@@ -1,4 +1,4 @@
-===== Installation =====
+#### Installation
 
 - Installer les dépendances
 
@@ -8,16 +8,22 @@
 
 - Exécuter schema.sql pour générer le scheam de la BDD
 
-===== Utilisation =====
+#### Utilisation
 
 - Editer crawler.js pour mettre les bonnes options (zone "CONFIGURATION" en haut)
 
 - Lancer le crawler avec
     
-    $ node crawler.js
+        $ node crawler.js
 
 - Lancer le server web 
     
-    $ node www/app.js
+        $ node www/app.js
 
-- Aller sur http://localhost:3000 et .. have fun !
+- Aller sur http://localhost:3000 et … have fun !
+
+
+#### Remarques
+
+- Les annonces déjà visitées restent en "visited" grace au navigateur :)
+- vider de temps en temps la BDD si trop de données dans la page web
