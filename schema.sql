@@ -1,0 +1,17 @@
+CREATE TABLE `places` (
+  `provider_id` int(11) DEFAULT NULL,
+  `provider_place_id` int(11) DEFAULT NULL,
+  `title` TEXT DEFAULT NULL,
+  `href` TEXT DEFAULT NULL,
+  `price` int(11) DEFAULT NULL,
+  `zip` int(11) DEFAULT NULL,
+  `proximity` TEXT DEFAULT NULL,
+  `type` int(11) DEFAULT NULL,
+  `cc` tinyint(1) DEFAULT NULL,
+  `fai` tinyint(1) DEFAULT NULL,
+  `surface` int(11) DEFAULT NULL,
+  `provider_at` INT(11) DEFAULT 0,
+  `created_at` INT(11) DEFAULT 0,
+  `updated_at` INT(11) DEFAULT 0,
+  PRIMARY KEY (`provider_id`, `provider_place_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
